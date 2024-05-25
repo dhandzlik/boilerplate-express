@@ -1,11 +1,15 @@
 let express = require('express');
+const { setupBackgroundApp } = require('fcc-express-bground');
 let app = express();
 require('dotenv').config();
+var bodyParser = require("body-parser");
 
 app.use(function middleware(req, res, next) {
     console.log(req.method + " " + req.path + " - " + req.ip);
     next();
 })
+
+app.use(bodyParser.urlencoded({extended: false}));
 
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/views/index.html");
@@ -24,6 +28,27 @@ app.get("/json", (req, res) => {
 
     res.json({
         message: response
+    });
+});
+
+app.get("/now", (req, res, next) => {
+    req.time = new Date().toString();
+    next();
+}, (req, res) => {
+    res.json({
+        time: req.time
+    });
+});
+
+app.get("/:word/echo", (req, res) => {
+    res.json({
+        echo: req.params.word
+    });
+});
+
+app.get("/name", (req, res) => {
+    res.json({
+        name: req.query.first + " " + req.query.last
     })
 });
 
